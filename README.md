@@ -1,10 +1,4 @@
-# Guidance Title (required)
-
-The Guidance title should be consistent with the title established first in Alchemy.
-
-**Example:** *Guidance for Product Substitutions on AWS*
-
-This title correlates exactly to the Guidance it’s linked to, including its corresponding sample code repository. 
+# Guidance for Multi-Modal Video Analytics of Smart Product Value-added Subscription Services on AWS
 
 
 ## Table of Content (required)
