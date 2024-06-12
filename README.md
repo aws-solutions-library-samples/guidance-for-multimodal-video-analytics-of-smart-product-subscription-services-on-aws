@@ -21,7 +21,7 @@ List the top-level sections of the README template, along with a hyperlink to th
 
 8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
 
-## Overview (required)
+## Overview
 
 ### **Background**  
 The rapid advancement of AI technology has revolutionized video analysis, especially in smart cameras, devices and smart homes industry, moving away from traditional models that depend on extensive datasets and manual feature extraction. These older methods suffer from limited generalization, inability to handle multimodal data, and poor contextual understanding. In contrast, large multimodal models like Claude 3 overcome these limitations with automatic feature learning, strong generalization across diverse data, integrated processing of visual, audio, and text information, and robust contextual modeling. This allows for rapid validation and reduced development costs in specific business scenarios, bypassing the cumbersome steps of traditional models.
@@ -73,8 +73,8 @@ The following table provides a sample cost breakdown for deploying this Guidance
 
 ## Prerequisites 
 
-### AWS account requirements (If applicable)
-**Example resources:**
+### AWS account requirements
+**resources:**
 - Bedrock and Claude3 model access
 - S3 bucket
 - API Gateway 80/443 port access
