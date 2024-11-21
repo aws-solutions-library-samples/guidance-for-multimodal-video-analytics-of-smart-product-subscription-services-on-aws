@@ -48,6 +48,10 @@ In such scenarios, intelligent camera manufacturers face the following challenge
 
 After analyzing and storing video data, the end user expects to retrieve, query, ask questions, and summarize specific events of interest efficiently. For instance, when continuously monitoring pets at home with video surveillance, the user should be able to quickly find relevant video clips through retrospective queries, replay, view, and summarize interesting details during a specific time period. However, traditional methods lack this capability.
 
+#### Image Search
+The video data and frames are stored in a vector database, enabling users to quickly locate specific images and corresponding video clips through natural language queries. For example, users can search by entering phrases like "My dog and I playing on the grass."
+
+
 ### - **Architecture Diagram**
 ![System Architecture Diagram](assets/images/diagram.png)  
 
@@ -69,7 +73,12 @@ The following table provides a sample cost breakdown for deploying this Guidance
 | AWS service  | Dimensions [Token Number] | Input Token Cost [USD] |Output Token Cost [USD] |
 | ----------- | ------------ | ------------ |------------ |
 | Amazon Bedrock Claude3 Haiku | 1 Million  | $ 0.25 |$ 1.25 |
-| Amazon Bedrock Claude3 Haiku | 1 Millon | $ 3.00 |$ 15.00 |
+| Amazon Bedrock Claude3.5 Sonnet-v2 | 1 Millon | $ 3.00 |$ 15.00 |
+
+| AWS service  | Spacification | Pricing|
+| ----------- | ------------ | ------------ |
+| Amazon OpenSearch Service | 	1 domain  m5.large.search, per month | $ 103.66 |
+| Amazon DynamoDB |  100000 write, 1000 read , per month| $ 2.6 |
 
 ## Prerequisites 
 
@@ -78,103 +87,82 @@ The following table provides a sample cost breakdown for deploying this Guidance
 - Bedrock and Claude3 model access
 - S3 bucket
 - API Gateway 80/443 port access
+- OpenSearch
+- Lambda
 
 
-### aws cdk bootstrap (TODO)
+### aws cdk bootstrap
 
-<If using aws-cdk, include steps for account bootstrap for new cdk users.>
+This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping in your deployment ec2
+```
+$ sudo cdk bootstrap
+```
 
-**Example blurb:** “This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping....”
+### Supported Regions
 
-### Service limits  (if applicable)
-
-<Talk about any critical service limits that affect the regular functioning of the Guidance. If the Guidance requires service limit increase, include the service name, limit name and link to the service quotas page.>
-
-### Supported Regions (if applicable)
-
-<If the Guidance is built for specific AWS Regions, or if the services used in the Guidance do not support all Regions, please specify the Region this Guidance is best suited for>
+- us-east-1
+- us-west-2
 
 
-## Deployment Steps (TODO)
+## Deployment Steps
+Your deployment ec2 should have pe
 
-Deployment steps must be numbered, comprehensive, and usable to customers at any level of AWS expertise. The steps must include the precise commands to run, and describe the action it performs.
-
-* All steps must be numbered.
-* If the step requires manual actions from the AWS console, include a screenshot if possible.
-* The steps must start with the following command to clone the repo. ```git clone xxxxxxx```
-* If applicable, provide instructions to create the Python virtual environment, and installing the packages using ```requirement.txt```.
-* If applicable, provide instructions to capture the deployed resource ARN or ID using the CLI command (recommended), or console action.
-
- 
-**Example:**
-
-1. Clone the repo using command ```git clone xxxxxxxxxx```
-2. cd to the repo folder ```cd <repo-name>```
-3. Install packages in requirements using command ```pip install requirement.txt```
-4. Edit content of **file-name** and replace **s3-bucket** with the bucket name in your account.
-5. Run this command to deploy the stack ```cdk deploy``` 
-6. Capture the domain name created by running this CLI command ```aws apigateway ............```
-
-
-
-## Deployment Validation  (TODO)
-
-<Provide steps to validate a successful deployment, such as terminal output, verifying that the resource is created, status of the CloudFormation template, etc.>
-
-
-**Examples:**
-
-* Open CloudFormation console and verify the status of the template with the name starting with xxxxxx.
-* If deployment is successful, you should see an active database instance with the name starting with <xxxxx> in        the RDS console.
-*  Run the following CLI command to validate the deployment: ```aws cloudformation describe xxxxxxxxxxxxx```
-
-
-
-## Running the Guidance (TODO)
-
-<Provide instructions to run the Guidance with the sample data or input provided, and interpret the output received.> 
-
-This section should include:
-
-* Guidance inputs
-* Commands to run
-* Expected output (provide screenshot if possible)
-* Output description
+1. Clone the repo  
+```bash
+$ git clone https://github.com/aws-solutions-library-samples/guidance-for-multi-modal-video-analytics-of-smart-product-value-added-subscription-services-on-aws.git
+```
+2. cd to the repo folder   
+```bash
+$ cd guidance-for-multi-modal-video-analytics-main/deployment/cdk/
+```
+3. Install packages
+```bash
+sudo yum install python3-pip -y && \
+sudo curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash - && \
+sudo yum install -y nodejs && \
+sudo pip install aws-cdk.core && \
+sudo pip install aws-cdk-lib constructs && \
+sudo pip install --upgrade constructs && \
+sudo pip install cdk-ecr-deployment && \
+sudo python3 -m pip install --upgrade aws-cdk-lib && \
+sudo npm install -g aws-cdk && \
+pip install opensearch-py && \
+sudo pip install boto3 && \
+sudo yum install -y docker && \
+sudo systemctl start docker
+```
+4. Run this command to deploy the stack 
+```bash
+$ sudo cdk deploy --all --require-approval never
+``` 
+5. After cdk deploy is over, you will get many output parameters in console, record webappcloudfront.
 
 
 
-## Next Steps (TODO)
+## Deployment Validation
 
-Provide suggestions and recommendations about how customers can modify the parameters and the components of the Guidance to further enhance it according to their requirements.
-
-
-## Cleanup (TODO)
-
-- Include detailed instructions, commands, and console actions to delete the deployed Guidance.
-- If the Guidance requires manual deletion of resources, such as the content of an S3 bucket, please specify.
+* Open CloudFormation console and verify the status of the template, find a address like xxxxxxxxx.cloudfront.net.
 
 
 
-## FAQ, known issues, additional considerations, and limitations (TODO)
+## Running the Guidance
+
+Go to login in the website
+Enter the url webappcloudfront from browser, create an account, then you have completed the deployment
+Video stream sample
+If you want to test video stream as input resource, please check kvs_configuration_tutorial as a reference  
 
 
-**Known issues (optional)**
-
-<If there are common known issues, or errors that can occur during the Guidance deployment, describe the issue and resolution steps here>
-
-
-**Additional considerations (if applicable)**
-
-<Include considerations the customer must know while using the Guidance, such as anti-patterns, or billing considerations.>
-
-**Examples:**
-
-- “This Guidance creates a public AWS bucket required for the use-case.”
-- “This Guidance created an Amazon SageMaker notebook that is billed per hour irrespective of usage.”
-- “This Guidance creates unauthenticated public API endpoints.”
+## Cleanup
+```bash
+$ sudo cdk destroy --all
+```
 
 
-Provide a link to the *GitHub issues page* for users to provide feedback.
+## FAQ
 
+* Question 1:  Can this guidance accept/process image input?   
+Answer: No, this guidance currently only processes videos from S3 and video streams from KVS.
 
-**Example:** *“For any feedback, questions, or suggestions, please use the issues tab under this repo.”*
+* Question 2: Can I perform video analysis through the API?  
+Answer: Yes, you can use api Gateway URL to invoke.
