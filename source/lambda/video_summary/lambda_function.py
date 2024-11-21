@@ -48,7 +48,9 @@ def generate_conversation(bedrock_client,
 
     # Log token usage.
     token_usage = response['usage']
-    
+    logger.info("Input tokens: %s", token_usage['inputTokens'])
+    logger.info("Output tokens: %s", token_usage['outputTokens'])
+    logger.info("Total tokens: %s", token_usage['totalTokens'])
     logger.info("Stop reason: %s", response['stopReason'])
 
     return response

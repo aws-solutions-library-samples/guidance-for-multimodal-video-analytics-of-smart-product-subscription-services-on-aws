@@ -26,14 +26,14 @@ def lambda_handler(event, context):
     ffprobe_binary_path = '/opt/ffprobe'
 
     # Copy the ffmpeg binary to a writable directory
-    tmp_dir = '/frames'
+    tmp_dir = '/tmp'
     os.makedirs(tmp_dir, exist_ok=True)
     tmp_ffmpeg_path = os.path.join(tmp_dir, 'ffmpeg')
     shutil.copy(ffmpeg_binary_path, tmp_ffmpeg_path)
-    os.chmod(Path(tmp_ffmpeg_path), 0o644)
+    os.chmod(Path(tmp_ffmpeg_path), 0o755)
     tmp_ffprobe_path = os.path.join(tmp_dir, 'ffprobe')
     shutil.copy(ffprobe_binary_path, tmp_ffprobe_path)
-    os.chmod(Path(tmp_ffprobe_path), 0o644)
+    os.chmod(Path(tmp_ffprobe_path), 0o755)
 
     # Add tmp folder the PATH env var
     current_path = os.environ.get('PATH', '')
@@ -174,11 +174,11 @@ def lambda_handler(event, context):
     # S3 frame extraction
     elif video_source_type == 's3':
         # download video file from S3
-        s3.download_file(video_upload_bucket_name, video_source_content, '/frames/video.mp4')
-        original_stream = ffmpeg.input('/frames/video.mp4')
+        s3.download_file(video_upload_bucket_name, video_source_content, '/tmp/video.mp4')
+        original_stream = ffmpeg.input('/tmp/video.mp4')
 
         try:
-            probe = ffmpeg.probe('/frames/video.mp4')
+            probe = ffmpeg.probe('/tmp/video.mp4')
             original_stream_duration = math.floor(float(probe['format']['duration']))
 
             task_timestamp = datetime.now().strftime('%Y-%m%d-%H%M%S')

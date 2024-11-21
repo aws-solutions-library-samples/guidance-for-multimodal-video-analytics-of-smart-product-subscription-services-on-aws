@@ -59,8 +59,7 @@ def get_titan_multimodal_embedding(
     if description:
         payload_body["inputText"] = description
 
-    if not payload_body:
-        raise ValueError("Please provide either an image and/or a text description")
+    assert payload_body, "please provide either an image and/or a text description"
     # print("\n".join(payload_body.keys()))
 
     response = bedrock_client.invoke_model(

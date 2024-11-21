@@ -292,7 +292,7 @@ class MultiModalVideoAnalyticsLambdaStack(Stack):
                 "OPENSEARCH_ENDPOINT": storage_stack.ops_domain.domain_endpoint,
                 "INDEX_NAME": "multimodal-knn-index",
                 "RERANK":"N",
-                "PROCESS":"N"
+                "PREPROCESS":"N"
             }
         )
         self.opensearch_retrieve.node.add_dependency(storage_stack.ops_domain, self.layer_opensearch, self.layer_rerank)
@@ -505,7 +505,8 @@ class MultiModalVideoAnalyticsECSStack(Stack):
                               assumed_by=iam.ServicePrincipal("ecs-tasks.amazonaws.com"),
                               managed_policies=[
                                   iam.ManagedPolicy.from_aws_managed_policy_name("AmazonS3FullAccess"),
-                                  iam.ManagedPolicy.from_aws_managed_policy_name("AWSLambda_FullAccess")
+                                  iam.ManagedPolicy.from_aws_managed_policy_name("AWSLambda_FullAccess"),
+                                  iam.ManagedPolicy.from_aws_managed_policy_name("AmazonKinesisVideoStreamsFullAccess")
                               ])
         
         # 6. Create ECS Task Definition

@@ -28,7 +28,7 @@ def download_files_from_s3(bucket_name, folder_path):
         
         # 创建用于存储下载文件的目录
         random_id = str(uuid.uuid4())[:8]  # 生成一个8位的随机字符串
-        download_dir = f'/frames/downloaded_images_{random_id}'
+        download_dir = f'/tmp/downloaded_images_{random_id}'
         os.makedirs(download_dir, exist_ok=True)
 
         # 列出要下载的文件

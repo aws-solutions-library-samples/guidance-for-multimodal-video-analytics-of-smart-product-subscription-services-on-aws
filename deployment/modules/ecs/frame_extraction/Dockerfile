@@ -28,13 +28,5 @@ RUN apt-get update -y && \
 # copy code
 COPY . /app
 
-USER appuser
-
-HEALTHCHECK --interval=30s \
-            --timeout=3s \
-            --start-period=30s \
-            --retries=3 \
-            USER non-root CMD curl -f http://localhost:${PORT:-8080}/health || exit 1
-
 # Run frame_extraction_ecs.py when the container launches
 CMD ["python", "frame_extraction_ecs.py"]

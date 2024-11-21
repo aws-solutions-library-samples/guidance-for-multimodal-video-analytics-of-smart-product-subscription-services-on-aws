@@ -54,31 +54,34 @@ aos_client = OpenSearch(
 
 index_name = "multimodal-knn-index"
 index_body = {
-   "settings": {
-      "index.knn": "true"
-   },
-   "mappings": {
-      "properties": {
-         "image_vector": {
-            "type": "knn_vector",
-            "dimension": 1024, # Embedding size for Amanon Titan Multimodal Embedding G1 model, it is 1,024 (default), 384, 256
-            "method": {
-                "name": "hnsw",
-                "space_type": "l2",
-                "engine": "faiss",
-                "parameters": {
-                "ef_construction": 128,
-                "m": 24
+    "settings": {
+        "index": {
+            "knn": True,
+            "number_of_shards": 1  # 只使用一个分片
+        }
+    },
+    "mappings": {
+        "properties": {
+            "image_vector": {
+                "type": "knn_vector",
+                "dimension": 1024,  # Embedding size for Amazon Titan Multimodal Embedding G1 model
+                "method": {
+                    "name": "hnsw",
+                    "space_type": "l2",
+                    "engine": "nmslib",  # 使用 nmslib 作为 KNN 算法
+                    "parameters": {
+                        "ef_construction": 128,
+                        "m": 24
+                    }
                 }
-            }
-         },
-         "user_id": {"type": "keyword"},
-         "timestamp" : {"type": "date"},
-         "description": {"type": "text"},
-         "image_url": {"type": "text"},
-         "video_resource": {"type": "text"},
-      }
-   }
+            },
+            "user_id": {"type": "keyword"},
+            "timestamp": {"type": "date"},
+            "description": {"type": "text"},
+            "image_url": {"type": "text"},
+            "video_resource": {"type": "text"},
+        }
+    }
 }
 
 try:
@@ -172,7 +175,7 @@ Assistant:
 '''
 
 user_prompt = '''
-You have perfect vision and pay great attention to detail which makes you an expert at traffic video monitor.
+You have perfect vision and pay great attention to detail which makes you an expert at home video monitor.
 Before answering the question in <answer> tags, please think about it step-by-step within <thinking></thinking> tags
 '''
 

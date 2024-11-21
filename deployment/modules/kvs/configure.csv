@@ -1,0 +1,6 @@
+gst_plugin_path,/home/ubuntu/amazon-kinesis-video-streams-producer-sdk-cpp/build
+video_file_path,/home/ubuntu/kvs_configuration_tutorial/samplevideo.mp4
+stream_name,MultiModalVideoAnalytics
+access_key,xxxxxxxxxxxxxxxxxxxxxxx
+secret_key,xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+aws_region,us-east-1

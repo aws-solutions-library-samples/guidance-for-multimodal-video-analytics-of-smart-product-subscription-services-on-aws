@@ -1,0 +1,27 @@
+.fixed-size {
+  width: 100%;
+  resize: none;
+  max-height: 500px;
+  overflow-y: auto;
+}
+
+.img {
+  height: 300px;
+}
+
+.btn-container {
+  float: right;
+}
+
+.line {
+  width: 0;
+  height: 100%;
+  padding-left: 40px;
+  border-right: 1px solid;
+  border-color: lightgray;
+}
+
+.container {
+  padding-left: 10px;
+  padding-right: 10px;
+}

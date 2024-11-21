@@ -2,7 +2,7 @@ import boto3
 import logging
 from botocore.exceptions import ClientError
 from boto3.dynamodb.conditions import Key
-from lxml import etree as ET
+import xml.etree.ElementTree as ET
 import os
 
 dynamodb = boto3.resource('dynamodb')

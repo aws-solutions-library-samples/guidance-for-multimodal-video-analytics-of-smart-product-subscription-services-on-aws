@@ -5,7 +5,6 @@ import logging
 import os
 from dynamodb_utils import query_dynamodb, create_xml
 from botocore.exceptions import ClientError
-from lxml import etree
 
 logger = logging.getLogger(__name__)
 
@@ -205,14 +204,9 @@ def lambda_handler(event, context):
 
     record = query_result
     prompt_prefix = """Below is video analytics event results.\n"""
-    
-    root = etree.Element("task")
-    root.text = postprocess_prompt
-    postprocess_prompt = etree.tostring(root, pretty_print=True, encoding="unicode")
+    postprocess_prompt = '\n<task>\n' + postprocess_prompt + '\n</task>' 
     
     final_input = prompt_prefix + record + postprocess_prompt
-    
-    
 
 
     prompts = [final_input]

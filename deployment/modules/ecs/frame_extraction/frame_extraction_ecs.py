@@ -8,7 +8,6 @@ import ffmpeg
 import logging
 import shutil
 from datetime import datetime, timedelta
-import tempfile
 
 logger = logging.getLogger()
 logger.setLevel(logging.INFO)
@@ -25,14 +24,14 @@ def main():
     ffprobe_binary_path = '/usr/bin/ffprobe'
 
     # 创建临时目录
-    tmp_dir = '/frames'
+    tmp_dir = '/tmp'
     os.makedirs(tmp_dir, exist_ok=True)
 
     # 复制 FFmpeg 和 FFprobe 到可写目录
     shutil.copy(ffmpeg_binary_path, os.path.join(tmp_dir, 'ffmpeg'))
     shutil.copy(ffprobe_binary_path, os.path.join(tmp_dir, 'ffprobe'))
-    os.chmod(os.path.join(tmp_dir, 'ffmpeg'), 0o644)
-    os.chmod(os.path.join(tmp_dir, 'ffprobe'), 0o644)
+    os.chmod(os.path.join(tmp_dir, 'ffmpeg'), 0o755)
+    os.chmod(os.path.join(tmp_dir, 'ffprobe'), 0o755)
 
     # 更新环境变量 PATH
     current_path = os.environ.get('PATH', '')
@@ -77,11 +76,10 @@ def main():
                            system_prompt, user_prompt, model_id, temperature, top_p,
                            top_k, max_tokens, connection_id, video_source_type)
 
-    
 def extract_frames_from_kvs(tmp_dir, frequency, list_length, interval, duration, image_size,
                             video_source_content, video_info_bucket_name, user_id,
                             video_analysis_lambda, system_prompt, user_prompt, model_id,
-                            temperature, top_p, top_k, max_tokens, connection_id):
+                            temperature, top_p, top_k, max_tokens, connection_id, video_source_type):
 
     task_timestamp = datetime.now().strftime('%Y-%m-%d-%H%M%S')
     cycle_limit = int(duration / frequency)
@@ -184,11 +182,11 @@ def extract_frames_from_s3(tmp_dir, video_upload_bucket_name, video_source_conte
                            system_prompt, user_prompt, model_id, temperature, top_p,
                            top_k, max_tokens, connection_id, video_source_type):
 
-    s3.download_file(video_upload_bucket_name, video_source_content, '/frames/video.mp4')
-    original_stream = ffmpeg.input('/frames/video.mp4')
+    s3.download_file(video_upload_bucket_name, video_source_content, '/tmp/video.mp4')
+    original_stream = ffmpeg.input('/tmp/video.mp4')
 
     try:
-        probe = ffmpeg.probe('/frames/video.mp4')
+        probe = ffmpeg.probe('/tmp/video.mp4')
         original_stream_duration = math.floor(float(probe['format']['duration']))
         task_timestamp = datetime.now().strftime('%Y-%m-%d-%H%M%S')
         start_time = 0
