@@ -5,21 +5,16 @@
 
 List the top-level sections of the README template, along with a hyperlink to the specific section.
 
-### Required
-
 1. [Overview](#overview-required)
     - [Cost](#cost)
 2. [Prerequisites](#prerequisites-required)
-    - [Operating System](#operating-system-required)
 3. [Deployment Steps](#deployment-steps-required)
 4. [Deployment Validation](#deployment-validation-required)
 5. [Running the Guidance](#running-the-guidance-required)
 6. [Next Steps](#next-steps-required)
 7. [Cleanup](#cleanup-required)
 
-***Optional***
-
-8. [FAQ, known issues, additional considerations, and limitations](#faq-known-issues-additional-considerations-and-limitations-optional)
+8. [FAQ](#faq-known-issues-additional-considerations-and-limitations-optional)
 
 ## Overview
 
@@ -91,31 +86,140 @@ The following table provides a sample cost breakdown for deploying this Guidance
 - Lambda
 
 
-### aws cdk bootstrap
-
-This Guidance uses aws-cdk. If you are using aws-cdk for first time, please perform the below bootstrapping in your deployment ec2
-```
-$ sudo cdk bootstrap
-```
-
 ### Supported Regions
 
 - us-east-1
 - us-west-2
 
 
-## Deployment Steps
-Your deployment ec2 should have pe
+## Deployment Prerequisite
 
-1. Clone the repo  
+1. AWS credential is ready such as aws configure or environment, prefer administrator permission and us-east-1 or us-west-2 region. reference https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-envvars.html
+
+2. AWS CDK v2 for python is ready, reference https://docs.aws.amazon.com/zh_cn/cdk/v2/guide/getting_started.html
+
+3. Python boto3 is ready, reference https://boto3.amazonaws.com/v1/documentation/api/latest/guide/quickstart.html#installation
+4. Ensure bedrock Anthropic Claude models permission. Model recommendation: Claude3.5 sonnet and Claude3 haiku for video analysis/postprocess, titan-multimodal-embedding-v1 for embedding. Be care that Claude3 sonnet is not appropriate for postprocess jobs  
+
+
+## CDK Content
+This CDK code contains 4 stacks and deploys a multi-modal video analysis system, including S3 buckets, DynamoDB tables, Opensearch, Lambda functions, an API Gateway WebSocket API, Cognito authentication, and a frontend web application.
+
+1. MultiModalVideoAnalyticsStorageStack:
+
+    S3 Buckets:
+
+    * web-app-bucket: used to deploy the frontend web application
+
+    * video-upload-bucket: used to upload video files
+
+    * video-information-bucket: used to store video analysis results  
+    
+    Opensearch Domain:
+    * Opensearch: used to retrieve frame  
+    
+    DynamoDB Tables:
+    * DynamoDBPromptSample: used to store conversation prompts
+    * DynamoDBConnectionID: used to store WebSocket connection IDs
+    * DynamoDBChatHistory: used to store chat history
+    * DynamoDBResult: used to store video analysis results
+2. MultiModalVideoAnalyticsLambdaStack:
+
+    Lambda Layers:
+    * boto3: for the Python boto3 library
+    * ffmpeg: for video processing
+    * opensearch: for opensearch-client
+    * rerank: for reranking recall results
+    
+    Lambda Functions:
+    * websocket_notify: used to notify WebSocket clients
+    * websocket_connect: used to handle WebSocket connections
+    * websocket_disconnect: used to handle WebSocket disconnections
+    * websocket_default: used to handle the default WebSocket route
+    * get_kvs_streaming_url: used to get the Kinesis Video Streams stream URL
+    * get_s3_presigned_url: used to get the S3 pre-signed URL
+    * get_s3_video_url: used to get the S3 video file URL
+    * list_s3_videos: used to list the video files in the S3 bucket
+    * video_summary: used to generate video summaries
+    * video_analysis: used to perform video analysis
+    * frame_extraction: used to extract frames from videos
+    * configure_video_resource: used to configure video resources
+    * prompt_management_ws: used to manage conversation prompts
+    * vqa_chatbot: used to handle the visual question-answering chatbot
+    * agent_tool_send_device_mqtt: used to send device MQTT messages
+    * agent_tool_send_notification: used to send notifications
+    * opensearch_ingest: used to multi-modal embedding
+    * opensearch_retrieve: used to frame retrieve from opensearch
+3. MultiModalVideoAnalyticsAPIStack:
+
+    API Gateway
+    
+    Adds the following WebSocket routes:
+    * $connect: used to handle WebSocket connections
+    * $disconnect: used to handle WebSocket disconnections
+    * $default: used to handle the default WebSocket route
+    * configure_agent: used to configure the agent
+    * configure_video_resource: used to configure video resources
+    * get_kvs_streaming_url: used to get the Kinesis Video Streams stream URL
+    * get_s3_presigned_url: used to get the S3 pre-signed URL
+    * get_s3_video_url: used to get the S3 video file URL
+    * list_prompt: used to list the conversation prompts
+    * list_s3_videos: used to list the video files in the S3 bucket
+    * vqa_chatbot: used to handle the visual question-answering chatbot
+    * opensearch_retrieve: used to frame retrieve from opensearch
+4. MultiModalVideoAnalyticsWebAppStack:
+
+    * cognito user pool
+    * frontend web application via S3 bucket + cloudfront  
+
+## Deployment Steps
+Your deployment ec2/device should have a IAM role to access related AWS Resource.
+
+You also can referce the workdshop below:  
+[Workshop for Multi Modal Video Analytics on AWS](https://catalog.us-east-1.prod.workshops.aws/workshops/dd21f3c4-859f-4d4e-aed8-a7796aa4b2e7/zh-CN)
+
+## Quick Start: Deployment use CDK
+
+### Environment Setup(Optional)
+As an example, the solution uses EC2 in us-west-2 region for the build process.
+
+Log in to the AWS console, go to the EC2 service, and select "Launch new instance".
+
+![ec2-launch](./assets/images/EC2Launch.png)
+
+Set the EC2 Name to "MultiModalVideoAnalysticDeploy", select the instance image as "Amazon Linux 2023", type as "t3.large", storage 20GB, IAM with an Administrator EC2 permission. Keep the rest of the configuration as default, and click "Create". Wait for the creation to complete.
+
+![ec2-step1](./assets/images/EC2Config1.png)
+![ec2-step2](./assets/images/EC2Config2.png)
+![ec2-step3](./assets/images/EC2Config3.png)
+![ec2-step4](./assets/images/EC2Config4.png)
+![ec2-step5](./assets/images/EC2Config5.png)
+![ec2-step6](./assets/images/EC2Config6.png)
+![ec2-step7](./assets/images/EC2Config7.png)
+![ec2-step8](./assets/images/EC2Config8.png)
+
+Login in the EC2
+
+![ec2-step9](./assets/images/EC2Config9.png)
+![ec2-step10](./assets/images/EC2Config10.png)
+
+#### Get project repo
 ```bash
 $ git clone https://github.com/aws-solutions-library-samples/guidance-for-multi-modal-video-analytics-of-smart-product-value-added-subscription-services-on-aws.git
 ```
-2. cd to the repo folder   
-```bash
-$ cd guidance-for-multi-modal-video-analytics-main/deployment/cdk/
+
+You also can download the code package adn upload(optional)
 ```
-3. Install packages
+scp -i <path to your-ec2.pem>  <path to guidance-for-multi-modal-video-analytics-main.tar.gz> ec2-user@ec2-xxx-xxx-xxx-xxx.us-west-2.compute.amazonaws.com:/home/ec2-user
+```
+For example, `scp -i /Users/sunjimmy/Downloads/MultiModalVideoAnalystic.pem  /Users/sunjimmy/Downloads/guidance-for-multi-modal-video-analytics-main.tar.gz ec2-user@ec2-xx-xx-xx-xxx.us-west-2.compute.amazonaws.com:/home/ec2-user`
+
+Unzip the code
+```
+tar -xvf guidance-for-multi-modal-video-analytics.tar.gz
+```
+
+#### Build cdk and boto3 environment
 ```bash
 sudo yum install python3-pip -y && \
 sudo curl -sL https://rpm.nodesource.com/setup_18.x | sudo bash - && \
@@ -131,12 +235,22 @@ sudo pip install boto3 && \
 sudo yum install -y docker && \
 sudo systemctl start docker
 ```
-4. Run this command to deploy the stack 
+#### Deployment
 ```bash
-$ sudo cdk deploy --all --require-approval never
-``` 
-5. After cdk deploy is over, you will get many output parameters in console, record webappcloudfront.
+cd guidance-for-multi-modal-video-analytics/deployment/cdk
+sudo cdk bootstrap
+sudo cdk deploy --all --require-approval never #if need ecs for long video analysis, add -c create_ecs_stack=true
+```
+the duration time is about 40 minutes.
+![cdkbootstrap](./assets/images/cdkbootstrap.png)
+After cdk deploy is over, you will get many output parameters in console, record webappcloudfront.
 
+Additional configuration
+```
+export AWS_DEFAULT_REGION=us-west-2   # or change to your actual region
+python3 add_deployment.py 
+```
+![cdk-additional](./assets/images/additional.png)
 
 
 ## Deployment Validation
