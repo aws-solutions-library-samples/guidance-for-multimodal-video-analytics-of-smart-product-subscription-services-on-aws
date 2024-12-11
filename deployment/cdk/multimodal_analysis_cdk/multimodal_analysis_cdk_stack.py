@@ -37,7 +37,7 @@ from cdk_ecr_deployment import ECRDeployment, DockerImageName
 class MultiModalVideoAnalyticsStorageStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs) -> None:
         super().__init__(scope, construct_id, **kwargs)
-
+        self.template_options.description = "Guidance for Multi-Modal Video Analytics of Smart Product Subscription Services on AWS(SO9571)"
         # S3 Bucket
         
         self.s3_bucket_web_app = s3.Bucket(
